@@ -28,6 +28,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 .btn-learn{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;box-shadow:0 4px 15px rgba(102,126,234,.4)}
 .btn-wrong{background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;box-shadow:0 4px 15px rgba(245,87,108,.3)}
 .btn-test{background:linear-gradient(135deg,#38b2ac,#2d9cdb);color:#fff;box-shadow:0 4px 15px rgba(56,178,172,.35)}
+.btn-danao{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;box-shadow:0 4px 15px rgba(243,156,18,.35)}
 .btn-main .ico{font-size:28px}
 .btn-main .txt{display:flex;flex-direction:column;align-items:flex-start}
 .btn-main .txt small{font-size:12px;font-weight:400;opacity:.8}
@@ -83,6 +84,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 .card-btn:active{transform:scale(.95)}
 .btn-no{background:#fed7d7;color:#c53030}
 .btn-yes{background:#c6f6d5;color:#276749}
+.btn-next{background:#e2e8f0;color:#4a5568;font-size:15px}
 
 /* Result */
 .result-icon{font-size:80px;margin-bottom:12px}
@@ -116,14 +118,44 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 .wb-practice{background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff}
 .wb-clear{background:#fff5f5;color:#e53e3e;border:2px solid #fed7d7}
 
+/* ── Card slide feedback ── */
+@keyframes slideOutLeft{to{transform:translateX(-120%);opacity:0}}
+@keyframes slideOutRight{to{transform:translateX(120%);opacity:0}}
+@keyframes slideInRight{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.slide-out-left{animation:slideOutLeft .3s ease forwards;pointer-events:none}
+.slide-out-right{animation:slideOutRight .3s ease forwards;pointer-events:none}
+.slide-in-right{animation:slideInRight .25s ease}
+
+/* ── Wrong detail modal ── */
+.wrong-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+.wrong-modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.wrong-modal-box{position:relative;background:#fff;border-radius:24px;padding:28px 24px 20px;max-width:340px;width:100%;z-index:1;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.wm-char{text-align:center;font-size:80px;font-weight:700;color:#2d3748;line-height:1.1}
+.wm-pinyin{text-align:center;font-size:22px;color:#667eea;margin:4px 0 14px;font-weight:500}
+.wm-section{background:#f7fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.wm-label{font-size:11px;color:#a0aec0;font-weight:600;margin-bottom:6px;letter-spacing:1px}
+.wm-words{display:flex;gap:8px;flex-wrap:wrap}
+.wm-word{background:#eef2ff;border-radius:10px;padding:6px 14px;font-size:16px;font-weight:600;color:#667eea;cursor:pointer;transition:all .12s}
+.wm-word:active{background:#c3dafe;transform:scale(.95)}
+.wm-sentence{font-size:15px;color:#4a5568;line-height:1.6;cursor:pointer;transition:opacity .15s}
+.wm-sentence:active{opacity:.6}
+.wm-stroke-wrap{display:flex;align-items:center;gap:12px;background:#f7fafc;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.wm-stroke-box{width:80px;height:80px;background:#fff;border:2px solid #e2e8f0;border-radius:10px;flex-shrink:0;cursor:pointer}
+.wm-stroke-box:active{transform:scale(.96)}
+.wm-stroke-info{flex:1;display:flex;flex-direction:column;gap:4px;font-size:13px;color:#4a5568}
+.wm-btns{display:flex;gap:10px;margin-top:14px}
+.wm-btn{flex:1;padding:14px;border-radius:16px;border:none;font-size:15px;font-weight:700;cursor:pointer;transition:transform .12s}
+.wm-btn:active{transform:scale(.96)}
+.wm-btn-del{background:#fff5f5;color:#e53e3e;border:2px solid #fed7d7}
+.wm-btn-close{background:#eef2ff;color:#667eea;border:2px solid #c3dafe}
+.wm-count{text-align:center;font-size:12px;color:#e53e3e;margin-bottom:12px;font-weight:600}
+.speaking .wave{animation:pulse .6s ease infinite}
+
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{0%{transform:scale(.8)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
 .anim-in{animation:fadeIn .3s ease}.anim-pop{animation:pop .3s ease}
 .screen::-webkit-scrollbar{width:0;display:none}
-
-/* speaking animation */
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-.speaking .wave{animation:pulse .6s ease infinite}
 
 /* ── Stroke Animation ── */
 .fc-stroke-area{display:flex;align-items:center;gap:14px;background:rgba(0,0,0,.15);border-radius:16px;padding:12px 14px;margin-bottom:10px;width:100%}
@@ -392,6 +424,164 @@ const V={
 '回':{w:['回来','回家'],s:'放学回家了。'},
 '全':{w:['全部','安全'],s:'注意安全很重要。'},
 '变':{w:['变化','变成'],s:'毛毛虫变成了蝴蝶。'},
+'鸦':{w:['乌鸦','鸦雀'],s:'树上有一只乌鸦。'},
+'瓶':{w:['瓶子','花瓶'],s:'瓶子里有水。'},
+'喝':{w:['喝水','喝茶'],s:'运动后要多喝水。'},
+'想':{w:['想念','想法'],s:'我想念妈妈了。'},
+'厨':{w:['厨房','厨师'],s:'妈妈在厨房做饭。'},
+'滴':{w:['水滴','雨滴'],s:'雨滴从窗户上滑下来。'},
+'苗':{w:['小苗','禾苗'],s:'小苗在阳光里长大。'},
+'利':{w:['顺利','利用'],s:'祝你一切顺利。'},
+'拖':{w:['拖地','拖把'],s:'我帮妈妈拖地。'},
+'环':{w:['环境','花环'],s:'我们要保护环境。'},
+'拉':{w:['拉手','拉开'],s:'拉好妈妈的手。'},
+'盒':{w:['盒子','饭盒'],s:'盒子里有礼物。'},
+'桶':{w:['水桶','木桶'],s:'用水桶去打水。'},
+'农':{w:['农民','农村'],s:'农民伯伯种粮食。'},
+'病':{w:['生病','看病'],s:'生病了要去看医生。'},
+'做':{w:['做事','做饭'],s:'我帮妈妈做家务。'},
+'吃':{w:['吃饭','好吃'],s:'该吃饭了，快洗手。'},
+'护':{w:['保护','爱护'],s:'我们要保护小动物。'},
+'次':{w:['一次','这次'],s:'再试一次吧。'},
+'服':{w:['衣服','服务'],s:'衣服要穿整齐。'},
+'汉':{w:['汉字','汉族'],s:'我在学写汉字。'},
+'何':{w:['如何','何处'],s:'如何写好这个字？'},
+'戏':{w:['游戏','看戏'],s:'我们一起做游戏。'},
+'间':{w:['中间','时间'],s:'教室中间有一张桌子。'},
+'泉':{w:['泉水','温泉'],s:'泉水清清凉。'},
+'惜':{w:['可惜','珍惜'],s:'我们要珍惜时间。'},
+'柔':{w:['柔软','温柔'],s:'小猫的毛很柔软。'},
+'露':{w:['露水','露珠'],s:'早上草叶上有露水。'},
+'角':{w:['角落','三角形'],s:'桌子的角是尖尖的。'},
+'蜻':{w:['蜻蜓','蜻蜓飞'],s:'蜻蜓在花上飞。'},
+'蜓':{w:['蜻蜓'],s:'小蜻蜓真可爱。'},
+'咏':{w:['咏鹅','歌咏'],s:'我会背咏鹅这首诗。'},
+'贺':{w:['祝贺','贺卡'],s:'送你一张生日贺卡。'},
+'章':{w:['文章','章节'],s:'这篇文章写得真好。'},
+'碧':{w:['碧绿','碧玉'],s:'草地碧绿碧绿的。'},
+'妆':{w:['化妆','装扮'],s:'妈妈化妆真漂亮。'},
+'垂':{w:['垂下','垂柳'],s:'柳树的枝条垂下来。'},
+'裁':{w:['裁剪','裁缝'],s:'用剪刀裁剪纸张。'},
+'似':{w:['好像','似乎'],s:'弯弯的月儿似乎小船。'},
+'蝴':{w:['蝴蝶','蝴蝶花'],s:'蝴蝶在花丛中飞。'},
+'种':{w:['种花','种树'],s:'春天到了去种花。'},
+'相':{w:['相互','相信'],s:'好朋友要相互帮助。'},
+'装':{w:['装扮','假装'],s:'把自己装扮得美美的。'},
+'摘':{w:['摘花','摘果子'],s:'不要随便摘花哦。'},
+'踏':{w:['踏青','脚步'],s:'春天一起去踏青。'},
+'折':{w:['折纸','打折'],s:'我喜欢折纸飞机。'},
+'乱':{w:['不乱','乱跑'],s:'玩具不要乱放哦。'},
+'摇':{w:['摇头','摇摆'],s:'小鱼摇摇尾巴游走了。'},
+'保':{w:['保护','保温'],s:'我们要保护大树。'},
+'蔬':{w:['蔬菜','果蔬'],s:'多吃蔬菜身体好。'},
+'紫':{w:['紫色','紫花'],s:'这朵花是紫色的。'},
+'戴':{w:['穿戴','戴上'],s:'出门戴上小帽子。'},
+'饰':{w:['装饰','首饰'],s:'用花朵装饰房间。'},
+'练':{w:['练习','练字'],s:'每天要练习写字。'},
+'士':{w:['战士','勇士'],s:'解放军叔叔是勇敢的战士。'},
+'泥':{w:['泥巴','泥土'],s:'小猪喜欢玩泥巴。'},
+'划':{w:['划船','划水'],s:'去公园划小船。'},
+'捕':{w:['捕鱼','捕捉'],s:'小猫在河边捕鱼。'},
+'稼':{w:['庄稼','稼穑'],s:'田里的庄稼长得好。'},
+'领':{w:['本领','带领'],s:'小猫学捉老鼠的本领。'},
+'狐':{w:['狐狸','小狐狸'],s:'狐狸可真聪明。'},
+'狸':{w:['狐狸','小狸猫'],s:'小狐狸住在森林里。'},
+'直':{w:['一直','笔直'],s:'一直往前走就到了。'},
+'主':{w:['主人','主意'],s:'我是家里的小主人。'},
+'意':{w:['意思','注意'],s:'这个字是什么意思？'},
+'叼':{w:['叼走','叼着'],s:'小狗叼着骨头跑了。'},
+'烟':{w:['烟花','烟雾'],s:'过年放烟花真好看。'},
+'驴':{w:['小驴','毛驴'],s:'小驴在草地上吃草。'},
+'血':{w:['流血','鲜血'],s:'手指出血了要包扎。'},
+'潮':{w:['潮湿','退潮'],s:'海边的沙子潮湿湿的。'},
+'集':{w:['集合','赶集'],s:'小朋友们快集合。'},
+'鞭':{w:['鞭炮','鞭子'],s:'过年放鞭炮真热闹。'},
+'啦':{w:['来啦','好啦'],s:'妈妈喊我吃饭啦。'},
+'摔':{w:['摔倒','摔跤'],s:'小心别摔倒了。'},
+'扑':{w:['扑上来','扑通'],s:'小猫扑过来抓球。'},
+'通':{w:['通过','交通'],s:'红灯停绿灯通行。'},
+'掉':{w:['掉下','丢掉'],s:'树叶从树上掉下来了。'},
+'央':{w:['中央','央求'],s:'广场在城市的中央。'},
+'绝':{w:['绝对','绝句'],s:'这是一首好听的绝句。'},
+'灭':{w:['灭火','消灭'],s:'消防叔叔来灭火。'},
+'万':{w:['千万','万里'],s:'千万不要随便玩火。'},
+'舟':{w:['小舟','龙舟'],s:'小舟在水上漂。'},
+'翁':{w:['老翁','渔翁'],s:'河边的老翁在钓鱼。'},
+'笠':{w:['斗笠','草笠'],s:'老爷爷戴着斗笠。'},
+'钓':{w:['钓鱼','垂钓'],s:'周末和爸爸去钓鱼。'},
+'捏':{w:['捏住','捏泥巴'],s:'我喜欢捏泥巴玩。'},
+'猪':{w:['小猪','猪肉'],s:'小猪胖嘟嘟的真可爱。'},
+'八':{w:['八个','八方'],s:'树上有八只小鸟。'},
+'戒':{w:['戒指','猪八戒'],s:'猪八戒真有趣。'},
+'僧':{w:['和尚','唐僧'],s:'唐僧去西天取经。'},
+'尚':{w:['和尚','高尚'],s:'故事里有一个老和尚。'},
+'悟':{w:['明白','孙悟空'],s:'孙悟空本领真大。'},
+'耍':{w:['玩耍','耍赖'],s:'和小伙伴一起玩耍。'},
+'所':{w:['所以','所有'],s:'所有玩具都收好了。'},
+'枚':{w:['一枚','几枚'],s:'我有一枚漂亮的邮票。'},
+'牧':{w:['放牧','牧童'],s:'牧童在草地上放牛。'},
+'骑':{w:['骑马','骑车'],s:'我会骑小自行车。'},
+'蝉':{w:['知了','鸣蝉'],s:'夏天知了在树上唱歌。'},
+'闭':{w:['闭上','关门'],s:'睡觉要闭上眼睛。'},
+'筝':{w:['风筝','古筝'],s:'春天去放风筝。'},
+'虹':{w:['彩虹','虹桥'],s:'雨后天空出现彩虹。'},
+'飘':{w:['飘落','飘荡'],s:'树叶从树上飘落下来。'},
+'追':{w:['追赶','追跑'],s:'小狗追着球跑。'},
+'兄':{w:['哥哥','兄弟'],s:'哥哥带我一起玩。'},
+'脚':{w:['小脚','脚步'],s:'我的小脚真能干。'},
+'虾':{w:['小虾','龙虾'],s:'小虾在水里游来游去。'},
+'寒':{w:['寒冷','寒假'],s:'冬天天气很寒冷。'},
+'霞':{w:['晚霞','朝霞'],s:'天边的晚霞真美。'},
+'塔':{w:['宝塔','灯塔'],s:'山顶上有一座宝塔。'},
+'租':{w:['租住','出租'],s:'我们租住在学校旁边。'},
+'扁':{w:['扁担','扁扁的'],s:'爷爷用扁担挑东西。'},
+'关':{w:['关门','关心'],s:'出门记得关好门。'},
+'棒':{w:['真棒','木棒'],s:'你今天表现真棒。'},
+'千':{w:['一千','千万'],s:'天上有一千颗星星。'},
+'年':{w:['新年','过年'],s:'新年快乐恭喜你。'},
+'颗':{w:['一颗','颗粒'],s:'天上有一颗亮星星。'},
+'愿':{w:['愿意','心愿'],s:'我的愿望是快快长大。'},
+'鸽':{w:['鸽子','白鸽'],s:'白鸽在天上飞。'},
+'百':{w:['一百','许多'],s:'花园里有一百朵花。'},
+'翅':{w:['翅膀','鸡翅'],s:'小鸟张开翅膀飞。'},
+'膀':{w:['翅膀','肩膀'],s:'爸爸的肩膀好宽。'},
+'弯':{w:['弯弯','弯曲'],s:'弯弯的月儿像小船。'},
+'喂':{w:['喂食','喂奶'],s:'我去喂小金鱼。'},
+'羊':{w:['小羊','山羊'],s:'小羊在草地上吃草。'},
+'嘴':{w:['嘴巴','小嘴'],s:'用嘴巴大口吃饭。'},
+'眯':{w:['眯眼','笑眯眯'],s:'小猫笑眯眯地看着我。'},
+'抓':{w:['抓住','抓紧'],s:'小猫抓住了老鼠。'},
+'咬':{w:['咬一口','咬牙'],s:'苹果咬一口甜甜的。'},
+'欺':{w:['欺负','欺骗'],s:'我们不能欺负小朋友。'},
+'负':{w:['欺负','负责'],s:'自己的事情要负责。'},
+'怕':{w:['害怕','不怕'],s:'勇敢的孩子不怕黑。'},
+'评':{w:['评价','批评'],s:'老师评价我写得好。'},
+'判':{w:['判断','审判'],s:'要学会判断对不对。'},
+'靠':{w:['依靠','靠边'],s:'走路要靠右边走。'},
+'教':{w:['教室','教学'],s:'我们在教室里上课。'},
+'节':{w:['节日','过节'],s:'过节了真开心。'},
+'礼':{w:['礼物','礼貌'],s:'收到礼物真开心。'},
+'拍':{w:['拍手','拍球'],s:'大家一起拍拍手。'},
+'照':{w:['照片','照顾'],s:'这张照片照得真好。'},
+'庆':{w:['庆祝','国庆'],s:'国庆节真热闹。'},
+'普':{w:['普通','普及'],s:'这是一朵普通的花。'},
+'欢':{w:['欢迎','欢乐'],s:'欢迎你来我家玩。'},
+'敬':{w:['敬爱','尊敬'],s:'敬爱老师有礼貌。'},
+'搞':{w:['搞笑','搞好'],s:'这个笑话真搞笑。'},
+'栽':{w:['栽树','栽花'],s:'春天一起栽小树。'},
+'蜜':{w:['蜜蜂','蜂蜜'],s:'小蜜蜂在采花蜜。'},
+'害':{w:['害怕','害虫'],s:'毛毛虫是害虫。'},
+'顶':{w:['头顶','山顶'],s:'山顶上有一棵大树。'},
+'元':{w:['元旦','元宝'],s:'元旦是新年的第一天。'},
+'汤':{w:['喝汤','菜汤'],s:'今天的汤真好喝。'},
+'取':{w:['取得','争取'],s:'争取做一个好孩子。'},
+'入':{w:['进入','入口'],s:'请从入口进去。'},
+'脸':{w:['脸蛋','洗脸'],s:'每天早上要洗脸。'},
+'立':{w:['站立','独立'],s:'请立正站好。'},
+'小':{w:['小鸟','大小'],s:'小鸟在树上唱歌。'},
+'皮':{w:['皮肤','皮球'],s:'我喜欢拍皮球。'},
+'正':{w:['正在','正好'],s:'我正在写作业。'},
+'让':{w:['让开','让座'],s:'给老奶奶让座。'},
 };
 
 // ═══════════════════════════════════════════
@@ -422,6 +612,14 @@ const LESSONS=[
 {id:'k12',name:'雪地里的小画家',group:'课文',color:'#667eea',chars:[['群','qún'],['竹','zhú'],['牙','yá'],['用','yòng'],['几','jǐ'],['步','bù'],['为','wéi'],['参','cān'],['加','jiā'],['洞','dòng'],['着','zháo']]},
 {id:'k13',name:'乌鸦喝水',group:'课文',color:'#2d3748',chars:[['乌','wū'],['鸦','yā'],['处','chù'],['找','zhǎo'],['办','bàn'],['旁','páng'],['许','xǔ'],['法','fǎ'],['放','fàng'],['进','jìn'],['高','gāo']]},
 {id:'k14',name:'小蜗牛',group:'课文',color:'#38b2ac',chars:[['住','zhù'],['孩','hái'],['玩','wán'],['吧','ba'],['发','fā'],['芽','yá'],['爬','pá'],['呀','ya'],['久','jiǔ'],['回','huí'],['全','quán'],['变','biàn']]},
+{id:'d1',name:'乌鸦喝水',group:'全脑识字（大班）',color:'#e67e22',chars:[['乌','wū'],['鸦','yā'],['口','kǒu'],['瓶','píng'],['喝','hē'],['想','xiǎng'],['办','bàn'],['法','fǎ'],['厨','chú'],['金','jīn'],['滴','dī'],['苗','miáo'],['起','qǐ'],['告','gào'],['报','bào'],['活','huó'],['用','yòng'],['利','lì'],['拖','tuō'],['环','huán'],['拉','lā'],['盒','hé'],['桶','tǒng'],['农','nóng'],['病','bìng'],['做','zuò'],['吃','chī'],['护','hù']]},
+{id:'d2',name:'古诗乐园',group:'全脑识字（大班）',color:'#27ae60',chars:[['南','nán'],['汉','hàn'],['可','kě'],['莲','lián'],['何','hé'],['戏','xì'],['间','jiān'],['北','běi'],['泉','quán'],['惜','xī'],['柔','róu'],['露','lù'],['角','jiǎo'],['蜻','qīng'],['蜓','tíng'],['咏','yǒng'],['贺','hè'],['章','zhāng'],['碧','bì'],['妆','zhuāng'],['垂','chuí'],['裁','cái'],['似','sì']]},
+{id:'d3',name:'夏天的故事',group:'全脑识字（大班）',color:'#e74c3c',chars:[['风','fēng'],['树','shù'],['桃','táo'],['快','kuài'],['种','zhòng'],['蝴','hú'],['夏','xià'],['相','xiāng'],['装','zhuāng'],['小','xiǎo'],['摘','zhāi'],['踏','tà'],['折','zhé'],['乱','luàn'],['摇','yáo'],['保','bǎo'],['蔬','shū'],['绿','lǜ'],['皮','pí'],['紫','zǐ']]},
+{id:'d4',name:'寓言故事',group:'全脑识字（大班）',color:'#8e44ad',chars:[['狐','hú'],['狸','lí'],['森','sēn'],['直','zhí'],['主','zhǔ'],['意','yì'],['叼','diāo'],['烟','yān'],['驴','lǘ'],['血','xuè'],['潮','cháo'],['集','jí'],['鞭','biān'],['正','zhèng'],['啦','lā'],['摔','shuāi'],['东','dōng'],['来','lái'],['让','ràng'],['扑','pū'],['通','tōng'],['掉','diào'],['进','jìn'],['央','yāng']]},
+{id:'d5',name:'快乐生活',group:'全脑识字（大班）',color:'#2980b9',chars:[['江','jiāng'],['绝','jué'],['灭','miè'],['万','wàn'],['舟','zhōu'],['翁','wēng'],['笠','lì'],['钓','diào'],['捏','niē'],['猪','zhū'],['八','bā'],['戒','jiè'],['僧','sēng'],['尚','shàng'],['悟','wù'],['耍','shuǎ'],['所','suǒ'],['见','jiàn'],['枚','méi'],['牧','mù'],['骑','qí'],['林','lín'],['蝉','chán'],['闭','bì'],['放','fàng'],['筝','zhēng'],['云','yún'],['虹','hóng'],['飘','piāo'],['空','kōng'],['追','zhuī'],['兄','xiōng'],['脚','jiǎo'],['鱼','yú'],['虾','xiā'],['寒','hán'],['霞','xiá'],['塔','tǎ'],['租','zū'],['美','měi'],['扁','biǎn'],['海','hǎi'],['关','guān'],['公','gōng'],['棒','bàng'],['几','jǐ'],['千','qiān'],['年','nián']]},
+{id:'d6',name:'节日与礼仪',group:'全脑识字（大班）',color:'#c0392b',chars:[['旗','qí'],['真','zhēn'],['颗','kē'],['愿','yuàn'],['鸽','gē'],['百','bǎi'],['翅','chì'],['膀','bǎng'],['亮','liàng'],['弯','wān'],['把','bǎ'],['刀','dāo'],['喂','wèi'],['羊','yáng'],['嘴','zuǐ'],['眯','mī'],['抓','zhuā'],['咬','yǎo'],['欺','qī'],['负','fù'],['怕','pà'],['评','píng'],['判','pàn'],['靠','kào'],['教','jiào'],['节','jié'],['九','jiǔ'],['十','shí'],['礼','lǐ'],['拍','pāi'],['张','zhāng'],['照','zhào'],['庆','qìng'],['日','rì'],['升','shēng'],['普','pǔ'],['同','tóng'],['欢','huān'],['向','xiàng'],['敬','jìng']]},
+{id:'d7',name:'自然与劳动',group:'全脑识字（大班）',color:'#16a085',chars:[['滴','dī'],['报','bào'],['告','gào'],['起','qǐ'],['搞','gǎo'],['栽','zāi'],['蜜','mì'],['活','huó'],['护','hù'],['苗','miáo'],['蛙','wā'],['做','zuò'],['吃','chī'],['害','hài'],['顶','dǐng'],['病','bìng'],['元','yuán'],['手','shǒu'],['汤','tāng'],['取','qǔ'],['入','rù'],['脸','liǎn'],['下','xià'],['南','nán'],['汉','hàn'],['可','kě'],['莲','lián'],['何','hé'],['戏','xì'],['间','jiān'],['北','běi'],['泉','quán'],['咏','yǒng'],['角','jiǎo'],['立','lì'],['蜻','qīng']]},
+{id:'d8',name:'综合复习',group:'全脑识字（大班）',color:'#d35400',chars:[['东','dōng'],['来','lái'],['让','ràng'],['扑','pū'],['狐','hú'],['狸','lí'],['森','sēn'],['直','zhí'],['主','zhǔ'],['青','qīng'],['泥','ní'],['巴','bā'],['本','běn'],['血','xuè'],['驴','lǘ'],['正','zhèng'],['鞭','biān'],['啦','lā'],['进','jìn'],['烟','yān']]},
 ];
 
 // ═══════════════════════════════════════════
@@ -485,6 +683,7 @@ function render(){
   switch(screen){
     case'home':renderHome(scr,title);break;
     case'lessons':renderLessons(scr,title);break;
+    case'danaoLessons':renderDanaoLessons(scr,title);break;
     case'card':case'wrongPractice':case'test':renderCard(scr,title);break;
     case'result':case'wrongResult':renderResult(scr,title,badge);break;
     case'wrong':renderWrong(scr,title,badge);break;
@@ -506,6 +705,7 @@ function renderHome(el,t){
       <button class="btn-main btn-learn" onclick="navigate('lessons')"><span class="ico">✏️</span><span class="txt">开始认字<small>选一课开始学习</small></span></button>
       <button class="btn-main btn-wrong" onclick="navigate('wrong')"><span class="ico">🔁</span><span class="txt">复习错字<small>${wc}个字需要复习</small></span></button>
       <button class="btn-main btn-test" onclick="startTest()"><span class="ico">📊</span><span class="txt">识字测评<small>测测大班小朋友认了多少字</small></span></button>
+      <button class="btn-main btn-danao" onclick="navigate('danaoLessons')"><span class="ico">🧠</span><span class="txt">全脑识字（大班）复习<small>${danaoCharCount()}个拓展汉字</small></span></button>
     </div></div>`;
 }
 
@@ -580,6 +780,7 @@ function renderCard(el,t){
     </div>`}
     <div class="card-btns">
       <button class="card-btn btn-no" onclick="markCard(false)">❌ 不会</button>
+      <button class="card-btn btn-next" onclick="nextCard()">⏭ 下一个</button>
       <button class="card-btn btn-yes" onclick="markCard(true)">✅ 认识</button>
     </div></div>`;
 }
@@ -611,10 +812,10 @@ function renderWrong(el,t,b){
   t.textContent='错字本';const wc=getWrongChars();
   b.textContent=wc.length+'字';b.style.display=wc.length?'':'none';
   if(!wc.length){el.innerHTML=`<div class="wrong-empty anim-in"><div class="we-icon">🎊</div><div class="we-text">还没有错字呢<br>去认字吧！</div></div>`;return}
-  const chips=wc.map(w=>`<div class="wrong-chip anim-in" onclick="removeWrong('${w.char}')">
+  const chips=wc.map(w=>`<div class="wrong-chip anim-in" onclick="showWrongDetail('${w.char}')">
     <div class="wc-char">${w.char}</div><div class="wc-py">${w.pinyin}</div><div class="wc-ct">错${w.count}次</div></div>`).join('');
   el.innerHTML=`<div class="anim-in">
-    <div style="text-align:center;font-size:14px;color:#718096;margin-bottom:16px">点一个字可以从错字本里删掉</div>
+    <div style="text-align:center;font-size:14px;color:#718096;margin-bottom:16px">点一个字可以查看详情</div>
     <div class="wrong-list">${chips}</div>
     <div class="wrong-actions">
       <button class="wrong-btn wb-practice" onclick="startWrongPractice()">🔁 全部复习一遍</button>
@@ -640,6 +841,34 @@ function startWrongPractice(){
   sess={lessonId:'wrong',lessonName:'错字复习',chars:shuffle(wc.map(w=>[w.char,w.pinyin])),idx:0,correct:0,wrong:[],showBack:false};
   navigate('wrongPractice');
 }
+function danaoCharCount(){return LESSONS.filter(l=>l.group==='全脑识字（大班）').reduce((s,l)=>s+l.chars.length,0)}
+function renderDanaoLessons(el,t){
+  t.textContent='全脑识字（大班）';
+  const ds=LESSONS.filter(l=>l.group==='全脑识字（大班）');
+  const totalDanao=danaoCharCount();
+  let h=`<div style="text-align:center;margin-bottom:16px" class="anim-in">
+    <div style="font-size:48px;margin-bottom:4px">🧠</div>
+    <div style="font-size:20px;font-weight:800;color:#2d3748">全脑识字（大班）复习</div>
+    <div style="font-size:13px;color:#718096;margin-top:4px">拓展汉字 · 共${totalDanao}字</div>
+  </div>`;
+  h+=`<button class="lesson-all anim-in" style="background:linear-gradient(135deg,#f39c12,#e67e22)" onclick="startAllDanao()">🎯 全部字卡一起练（${totalDanao}字）</button>`;
+  h+=`<div class="lesson-grid">`;
+  ds.forEach(l=>{
+    const tot=l.chars.length,w=l.chars.filter(([c])=>state.wrong[c]).length,lr=l.chars.filter(([c])=>state.learned[c]).length;
+    let bc='lc-new',bt='未学';if(w>0){bc='lc-part';bt=w+'个不会'}else if(lr===tot){bc='lc-done';bt='已学会'}
+    h+=`<div class="lesson-card anim-in" onclick="startLesson('${l.id}')">
+      <div class="lc-icon" style="background:${l.color}">${l.name[0]}</div>
+      <div class="lc-info"><div class="lc-name">${l.name}</div><div class="lc-chars">${l.chars.slice(0,8).map(c=>c[0]).join(' ')}${tot>8?' ...':''}</div></div>
+      <div class="lc-badge ${bc}">${bt}</div></div>`;
+  });
+  h+=`</div>`;
+  el.innerHTML=h;
+}
+function startAllDanao(){
+  const all=LESSONS.filter(l=>l.group==='全脑识字（大班）').flatMap(l=>l.chars);
+  sess={lessonId:'danaoAll',lessonName:'全脑识字·全部',chars:shuffle(all),idx:0,correct:0,wrong:[],showBack:false};
+  navigate('card');
+}
 function flipCard(){
   sess.showBack=!sess.showBack;
   if(sess.showBack){
@@ -654,23 +883,124 @@ function flipCard(){
 function markCard(ok){
   const[ch,py]=sess.chars[sess.idx];
   const isTest=screen==='test';
+
+  // Update state
   if(isTest){
-    // Test mode: only count, don't modify learned/wrong state
     if(ok) sess.correct++;
     else sess.wrong.push([ch,py]);
   } else {
     if(ok){sess.correct++;state.learned[ch]=true;if(state.wrong[ch]){state.wrong[ch].count--;if(state.wrong[ch].count<=0)delete state.wrong[ch]}}
-    else{sess.wrong.push([ch,py]);if(!state.wrong[ch])state.wrong[ch]={pinyin,count:0};state.wrong[ch].count++;delete state.learned[ch]}
+    else{sess.wrong.push([ch,py]);if(!state.wrong[ch])state.wrong[ch]={pinyin:py,count:0};state.wrong[ch].count++;delete state.learned[ch]}
     saveState();
   }
-  sess.idx++;sess.showBack=false;
-  if(sess.idx>=sess.chars.length)navigate(isTest?'testResult':screen==='wrongPractice'?'wrongResult':'result');
-  else render();
+
+  // Visual feedback: slide the card out
+  const cardEl=document.querySelector('.flashcard');
+  if(cardEl){
+    cardEl.classList.add(ok?'slide-out-right':'slide-out-left');
+  }
+
+  // Delay transition for animation
+  setTimeout(()=>{
+    sess.idx++;sess.showBack=false;
+    if(sess.idx>=sess.chars.length){
+      navigate(isTest?'testResult':screen==='wrongPractice'?'wrongResult':'result');
+    } else {
+      render();
+      // Slide-in animation for new card
+      const newCard=document.querySelector('.flashcard');
+      if(newCard) newCard.classList.add('slide-in-right');
+    }
+  },280);
 }
 function retryLesson(){if(!sess)return;sess.lessonId==='all'?startAll():startLesson(sess.lessonId)}
+function nextCard(){
+  if(!sess)return;
+  const cardEl=document.querySelector('.flashcard');
+  if(cardEl) cardEl.classList.add('slide-out-right');
+  setTimeout(()=>{
+    sess.idx++;sess.showBack=false;
+    const isTest=screen==='test';
+    if(sess.idx>=sess.chars.length){
+      navigate(isTest?'testResult':screen==='wrongPractice'?'wrongResult':'result');
+    } else {
+      render();
+      const newCard=document.querySelector('.flashcard');
+      if(newCard) newCard.classList.add('slide-in-right');
+    }
+  },280);
+}
 function retryWrong(){if(!sess||!sess.wrong.length)return;const w=sess.wrong;sess={lessonId:sess.lessonId,lessonName:(sess.lessonName||'')+'·错字',chars:shuffle(w),idx:0,correct:0,wrong:[],showBack:false};navigate('card')}
 function removeWrong(c){delete state.wrong[c];saveState();render()}
 function clearWrong(){if(confirm('确定清空所有错字吗？')){state.wrong={};saveState();render()}}
+
+// ── Wrong character detail modal ──
+let _wrongModalChar=null;
+function showWrongDetail(c){
+  _wrongModalChar=c;
+  const info=state.wrong[c];
+  if(!info)return;
+  const vocab=V[c];
+  const words=vocab?vocab.w:[];
+  const sentence=vocab?vocab.s:'';
+  const dynStroke=getStrokeCount(c);
+  const dynRadical=getRadical(c);
+
+  const wordsHtml=words.map(w=>`<span class="wm-word" onclick="speak('${w}')">${w}</span>`).join('');
+  const sentHtml=sentence?`<div class="wm-section"><div class="wm-label">💬 句子</div><div class="wm-sentence" onclick="speak('${sentence}')">${sentence}</div></div>`:'';
+  const strokeHtml=(dynStroke||dynRadical)?`<div class="wm-stroke-info">${dynStroke?'<span>笔画: '+dynStroke+' 画</span>':''}${dynRadical?'<span>部首: '+(typeof dynRadical==='string'?dynRadical:dynRadical.radical||'')+'</span>':''}</div>`:'';
+
+  const modal=document.createElement('div');
+  modal.className='wrong-modal';
+  modal.id='wrong-modal';
+  modal.innerHTML=`<div class="wrong-modal-bg" onclick="closeWrongModal()"></div>
+    <div class="wrong-modal-box anim-pop">
+      <div class="wm-char">${c}</div>
+      <div class="wm-pinyin">${info.pinyin}</div>
+      <div class="wm-count">累计错了 ${info.count} 次</div>
+      <div class="wm-stroke-wrap">
+        <div class="wm-stroke-box" id="wm-hw-target" onclick="replayModalStroke()"></div>
+        <div class="wm-stroke-info">
+          ${strokeHtml}
+          <div style="font-size:10px;color:#a0aec0;margin-top:4px">点动画可重播</div>
+        </div>
+      </div>
+      ${words.length?'<div class="wm-section"><div class="wm-label">📝 词语（点击朗读）</div><div class="wm-words">'+wordsHtml+'</div></div>':''}
+      ${sentHtml}
+      <div class="wm-btns">
+        <button class="wm-btn wm-btn-del" onclick="removeWrongFromModal()">🗑 从错字本删除</button>
+        <button class="wm-btn wm-btn-close" onclick="closeWrongModal()">✕ 关闭</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  // Init stroke animation
+  setTimeout(()=>initModalStroke(c),150);
+}
+function closeWrongModal(){
+  const m=document.getElementById('wrong-modal');
+  if(m)m.remove();
+  _wrongModalChar=null;
+}
+function removeWrongFromModal(){
+  if(_wrongModalChar){
+    delete state.wrong[_wrongModalChar];
+    saveState();
+  }
+  closeWrongModal();
+  render();
+}
+let _modalHw=null;
+function initModalStroke(ch){
+  try{
+    const el=document.getElementById('wm-hw-target');
+    if(!el||typeof HanziWriter==='undefined')return;
+    _modalHw=HanziWriter.create('wm-hw-target',ch,{width:80,height:80,padding:5,showOutline:true,strokeColor:'#333',outlineColor:'#ddd',delayBetweenStrokes:300,strokeAnimationSpeed:1});
+    _modalHw.animateCharacter();
+  }catch(e){console.log('Modal stroke init error:',e)}
+}
+function replayModalStroke(){
+  try{if(_modalHw)_modalHw.animateCharacter()}catch(e){}
+}
 
 // ═══════════════════════════════════════════
 // LITERACY TEST (识字测评)
