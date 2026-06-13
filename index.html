@@ -922,20 +922,71 @@ function renderDanaoLessons(el,t){
   t.textContent='全脑识字（大班）';
   const ds=LESSONS.filter(l=>l.group==='全脑识字（大班）');
   const totalDanao=danaoCharCount();
+
+  // 计算复习进度和正确率
+  const allDanaoChars=ds.flatMap(l=>l.chars.map(c=>c[0]));
+  const reviewedChars=allDanaoChars.filter(c=>state.learned[c]||state.wrong[c]);
+  const learnedDanao=allDanaoChars.filter(c=>state.learned[c]);
+  const wrongDanao=allDanaoChars.filter(c=>state.wrong[c]);
+  const reviewedCount=reviewedChars.length;
+  const learnedCount=learnedDanao.length;
+  const wrongCount=wrongDanao.length;
+  const progressPct=totalDanao?Math.round(reviewedCount/totalDanao*100):0;
+  const accuracyPct=reviewedCount?Math.round(learnedCount/reviewedCount*100):0;
+
   let h=`<div style="text-align:center;margin-bottom:16px" class="anim-in">
     <div style="font-size:48px;margin-bottom:4px">🧠</div>
     <div style="font-size:20px;font-weight:800;color:#2d3748">全脑识字（大班）复习</div>
     <div style="font-size:13px;color:#718096;margin-top:4px">拓展汉字 · 共${totalDanao}字</div>
   </div>`;
+
+  // 进度与正确率面板
+  h+=`<div class="anim-in" style="background:#f7fafc;border-radius:20px;padding:16px 18px;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="text-align:center;flex:1">
+        <div style="font-size:26px;font-weight:800;color:#667eea">${reviewedCount}<span style="font-size:14px;font-weight:400;color:#a0aec0">/${totalDanao}</span></div>
+        <div style="font-size:11px;color:#a0aec0;margin-top:2px">已复习</div>
+      </div>
+      <div style="width:1px;height:36px;background:#e2e8f0"></div>
+      <div style="text-align:center;flex:1">
+        <div style="font-size:26px;font-weight:800;color:#38a169">${learnedCount}</div>
+        <div style="font-size:11px;color:#a0aec0;margin-top:2px">已认识</div>
+      </div>
+      <div style="width:1px;height:36px;background:#e2e8f0"></div>
+      <div style="text-align:center;flex:1">
+        <div style="font-size:26px;font-weight:800;color:${accuracyPct>=80?'#38a169':accuracyPct>=50?'#ed8936':'#e53e3e'}">${reviewedCount?accuracyPct+'%':'--'}</div>
+        <div style="font-size:11px;color:#a0aec0;margin-top:2px">正确率</div>
+      </div>
+    </div>
+    <div style="position:relative">
+      <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${progressPct}%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:4px;transition:width .5s"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#a0aec0">
+        <span>复习进度 ${progressPct}%</span>
+        ${wrongCount?'<span style="color:#e53e3e">'+wrongCount+'个待加强</span>':''}
+      </div>
+    </div>
+  </div>`;
+
   h+=`<button class="lesson-all anim-in" style="background:linear-gradient(135deg,#f39c12,#e67e22)" onclick="startAllDanao()">🎯 全部字卡一起练（${totalDanao}字）</button>`;
   h+=`<div class="lesson-grid">`;
   ds.forEach(l=>{
     const tot=l.chars.length,w=l.chars.filter(([c])=>state.wrong[c]).length,lr=l.chars.filter(([c])=>state.learned[c]).length;
+    const rev=l.chars.filter(([c])=>state.learned[c]||state.wrong[c]).length;
+    const pct=tot?Math.round(rev/tot*100):0;
     let bc='lc-new',bt='未学';if(w>0){bc='lc-part';bt=w+'个不会'}else if(lr===tot){bc='lc-done';bt='已学会'}
     h+=`<div class="lesson-card anim-in" onclick="startLesson('${l.id}')">
       <div class="lc-icon" style="background:${l.color}">${l.name[0]}</div>
-      <div class="lc-info"><div class="lc-name">${l.name}</div><div class="lc-chars">${l.chars.slice(0,8).map(c=>c[0]).join(' ')}${tot>8?' ...':''}</div></div>
-      <div class="lc-badge ${bc}">${bt}</div></div>`;
+      <div class="lc-info">
+        <div class="lc-name">${l.name}</div>
+        <div class="lc-chars">${l.chars.slice(0,8).map(c=>c[0]).join(' ')}${tot>8?' ...':''}</div>
+        <div style="height:4px;background:#e2e8f0;border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct===100?'#38a169':'#667eea'};border-radius:2px"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        <div class="lc-badge ${bc}">${bt}</div>
+        <div style="font-size:10px;color:#a0aec0">${rev}/${tot}</div>
+      </div></div>`;
   });
   h+=`</div>`;
   el.innerHTML=h;
