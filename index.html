@@ -1018,7 +1018,7 @@ function markCard(ok){
     if(ok) sess.correct++;
     else sess.wrong.push([ch,py]);
   } else {
-    if(ok){sess.correct++;state.learned[ch]=true;if(state.wrong[ch]){state.wrong[ch].count--;if(state.wrong[ch].count<=0)delete state.wrong[ch]}}
+    if(ok){sess.correct++;state.learned[ch]=true;delete state.wrong[ch]}
     else{sess.wrong.push([ch,py]);if(!state.wrong[ch])state.wrong[ch]={pinyin:py,count:0};state.wrong[ch].count++;delete state.learned[ch]}
     saveState();
   }
@@ -1291,6 +1291,20 @@ function renderTestResult(el, t, b){
   </div>`;
 }
 
+// ── DATA CLEANUP (修复线上脏数据) ──
+function cleanupState(){
+  let dirty=false;
+  // 如果一个字同时在 learned 和 wrong 里，以 learned 为准，从 wrong 中移除
+  for(const c in state.wrong){
+    if(state.learned[c]){
+      delete state.wrong[c];
+      dirty=true;
+    }
+  }
+  if(dirty) saveState();
+}
+cleanupState();
+
 // ── INIT ──
 initVoice();
 render();
@@ -1488,6 +1502,7 @@ async function cloudLoad(){
           state.wrong=cloud.wrong||{};
           state.testHistory=cloud.testHistory||[];
           saveState();
+          cleanupState();
           render();
         }
       } else if(localLearned>0&&cloudLearned===0){
