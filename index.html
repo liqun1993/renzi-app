@@ -86,6 +86,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 .btn-no{background:#fed7d7;color:#c53030}
 .btn-yes{background:#c6f6d5;color:#276749}
 .btn-next{background:#e2e8f0;color:#4a5568;font-size:15px}
+.btn-prev{background:#e2e8f0;color:#4a5568;font-size:15px}
 
 /* Result */
 .result-icon{font-size:80px;margin-bottom:12px}
@@ -123,10 +124,12 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 @keyframes slideOutLeft{to{transform:translateX(-120%);opacity:0}}
 @keyframes slideOutRight{to{transform:translateX(120%);opacity:0}}
 @keyframes slideInRight{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideInLeft{from{transform:translateX(-40px);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 .slide-out-left{animation:slideOutLeft .3s ease forwards;pointer-events:none}
 .slide-out-right{animation:slideOutRight .3s ease forwards;pointer-events:none}
 .slide-in-right{animation:slideInRight .25s ease}
+.slide-in-left{animation:slideInLeft .25s ease}
 
 /* ── Wrong detail modal ── */
 .wrong-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
@@ -806,6 +809,7 @@ function renderCard(el,t){
     </div>`}
     <div class="card-btns">
       <button class="card-btn btn-no" onclick="markCard(false)">❌ 不会</button>
+      <button class="card-btn btn-prev" onclick="prevCard()">⏮ 上一个</button>
       <button class="card-btn btn-next" onclick="nextCard()">⏭ 下一个</button>
       <button class="card-btn btn-yes" onclick="markCard(true)">✅ 认识</button>
     </div></div>`;
@@ -954,6 +958,17 @@ function nextCard(){
       const newCard=document.querySelector('.flashcard');
       if(newCard) newCard.classList.add('slide-in-right');
     }
+  },280);
+}
+function prevCard(){
+  if(!sess||sess.idx<=0)return;
+  const cardEl=document.querySelector('.flashcard');
+  if(cardEl) cardEl.classList.add('slide-out-left');
+  setTimeout(()=>{
+    sess.idx--;sess.showBack=false;
+    render();
+    const newCard=document.querySelector('.flashcard');
+    if(newCard) newCard.classList.add('slide-in-left');
   },280);
 }
 function retryWrong(){if(!sess||!sess.wrong.length)return;const w=sess.wrong;sess={lessonId:sess.lessonId,lessonName:(sess.lessonName||'')+'·错字',chars:shuffle(w),idx:0,correct:0,wrong:[],showBack:false};navigate('card')}
