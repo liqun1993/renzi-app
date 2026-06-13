@@ -19,7 +19,8 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 .home-title{font-size:28px;font-weight:800;color:#2d3748;margin-bottom:6px}
 .home-sub{font-size:15px;color:#718096;margin-bottom:28px}
 .home-stats{display:flex;gap:12px;justify-content:center;margin-bottom:32px}
-.stat-box{background:#f7fafc;border-radius:16px;padding:14px 20px;text-align:center;min-width:100px}
+.stat-box{background:#f7fafc;border-radius:16px;padding:14px 20px;text-align:center;min-width:100px;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.stat-box:active{transform:scale(.95);box-shadow:0 2px 8px rgba(0,0,0,.1)}
 .stat-num{font-size:28px;font-weight:800;color:#667eea}
 .stat-label{font-size:12px;color:#a0aec0;margin-top:2px}
 .home-btns{display:flex;flex-direction:column;gap:14px;padding:0 12px}
@@ -153,6 +154,31 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 .speaking .wave{animation:pulse .6s ease infinite}
 
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* ── Character list modal ── */
+.charlist-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:0;animation:fadeIn .2s ease}
+.charlist-modal-bg{position:absolute;inset:0;background:rgba(0,0,0,.4)}
+.charlist-modal-box{position:relative;background:#fff;border-radius:24px 24px 0 0;padding:20px 16px 28px;width:100%;max-width:480px;max-height:75vh;z-index:1;overflow-y:auto;box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+.charlist-modal-box::-webkit-scrollbar{width:0;display:none}
+.clm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;position:sticky;top:0;background:#fff;padding-bottom:8px;z-index:1}
+.clm-title{font-size:18px;font-weight:800;color:#2d3748}
+.clm-count{font-size:13px;color:#a0aec0;font-weight:500}
+.clm-close{width:36px;height:36px;border-radius:50%;border:none;background:#f7fafc;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#718096}
+.clm-close:active{background:#e2e8f0}
+.clm-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start}
+.clm-chip{display:flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:12px;min-width:56px;cursor:pointer;transition:all .12s;font-size:13px}
+.clm-chip:active{transform:scale(.93)}
+.clm-chip-learned{background:#c6f6d5;border:1.5px solid #9ae6b4}
+.clm-chip-learned .clm-c{font-size:24px;font-weight:700;color:#276749}
+.clm-chip-learned .clm-p{font-size:10px;color:#38a169;margin-top:1px}
+.clm-chip-new{background:#f7fafc;border:1.5px solid #e2e8f0}
+.clm-chip-new .clm-c{font-size:24px;font-weight:700;color:#4a5568}
+.clm-chip-new .clm-p{font-size:10px;color:#a0aec0;margin-top:1px}
+.clm-chip-wrong{background:#fff5f5;border:1.5px solid #fed7d7}
+.clm-chip-wrong .clm-c{font-size:24px;font-weight:700;color:#e53e3e}
+.clm-chip-wrong .clm-p{font-size:10px;color:#e53e3e;margin-top:1px}
+.clm-empty{text-align:center;padding:40px 0;color:#a0aec0;font-size:15px}
+.clm-search{width:100%;padding:10px 14px;border-radius:12px;border:2px solid #e2e8f0;font-size:15px;outline:none;margin-bottom:12px;background:#f7fafc}
+.clm-search:focus{border-color:#667eea;background:#fff}
 @keyframes pop{0%{transform:scale(.8)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
 .anim-in{animation:fadeIn .3s ease}.anim-pop{animation:pop .3s ease}
 .screen::-webkit-scrollbar{width:0;display:none}
@@ -697,9 +723,9 @@ function renderHome(el,t){
   el.innerHTML=`<div class="home-hero anim-in">
     <div class="home-emoji">📖</div><div class="home-title">认字小能手</div><div class="home-sub">一年级上册 · 部编版</div>
     <div class="home-stats">
-      <div class="stat-box"><div class="stat-num">${lc}</div><div class="stat-label">已认识</div></div>
-      <div class="stat-box"><div class="stat-num">${tc}</div><div class="stat-label">总共</div></div>
-      <div class="stat-box"><div class="stat-num" style="color:${wc?'#e53e3e':'#38a169'}">${wc}</div><div class="stat-label">不会的</div></div>
+      <div class="stat-box" onclick="showCharList('learned')"><div class="stat-num">${lc}</div><div class="stat-label">已认识</div></div>
+      <div class="stat-box" onclick="showCharList('all')"><div class="stat-num">${tc}</div><div class="stat-label">总共</div></div>
+      <div class="stat-box" onclick="showCharList('wrong')" style="color:${wc?'#e53e3e':'#38a169'}"><div class="stat-num" style="color:${wc?'#e53e3e':'#38a169'}">${wc}</div><div class="stat-label">不会的</div></div>
     </div>
     <div class="home-btns">
       <button class="btn-main btn-learn" onclick="navigate('lessons')"><span class="ico">✏️</span><span class="txt">开始认字<small>选一课开始学习</small></span></button>
@@ -933,6 +959,67 @@ function nextCard(){
 function retryWrong(){if(!sess||!sess.wrong.length)return;const w=sess.wrong;sess={lessonId:sess.lessonId,lessonName:(sess.lessonName||'')+'·错字',chars:shuffle(w),idx:0,correct:0,wrong:[],showBack:false};navigate('card')}
 function removeWrong(c){delete state.wrong[c];saveState();render()}
 function clearWrong(){if(confirm('确定清空所有错字吗？')){state.wrong={};saveState();render()}}
+
+// ── Character list modal (点击统计数字查看汉字) ──
+function showCharList(type){
+  const modal=document.createElement('div');
+  modal.className='charlist-modal';
+  modal.id='charlist-modal';
+
+  let title='',chips=[];
+  if(type==='learned'){
+    title='已认识的汉字';
+    const allChars=LESSONS.flatMap(l=>l.chars);
+    allChars.forEach(([c,py])=>{
+      if(state.learned[c]) chips.push({char:c,pinyin:py,type:'learned'});
+    });
+  } else if(type==='all'){
+    title='全部汉字';
+    LESSONS.forEach(l=>{
+      l.chars.forEach(([c,py])=>{
+        const isLearned=!!state.learned[c];
+        const isWrong=!!state.wrong[c];
+        chips.push({char:c,pinyin:py,type:isWrong?'wrong':isLearned?'learned':'new',lesson:l.name});
+      });
+    });
+  } else if(type==='wrong'){
+    title='不会的汉字';
+    getWrongChars().forEach(w=>{
+      chips.push({char:w.char,pinyin:w.pinyin,type:'wrong',count:w.count});
+    });
+  }
+
+  const chipsHtml=chips.length?chips.map((c,i)=>`<div class="clm-chip clm-chip-${c.type}" onclick="speak('${c.char}')" data-char="${c.char}" data-py="${c.pinyin}" data-lesson="${c.lesson||''}">
+    <div class="clm-c">${c.char}</div><div class="clm-p">${c.pinyin}${c.count?' ('+c.count+'次)':''}</div></div>`).join(''):`<div class="clm-empty">还没有汉字记录</div>`;
+
+  modal.innerHTML=`<div class="charlist-modal-bg" onclick="closeCharList()"></div>
+    <div class="charlist-modal-box anim-in">
+      <div class="clm-header">
+        <div><div class="clm-title">${title}</div><div class="clm-count">${chips.length} 个字</div></div>
+        <button class="clm-close" onclick="closeCharList()">✕</button>
+      </div>
+      ${chips.length>10?'<input class="clm-search" type="text" placeholder="搜索汉字或拼音..." oninput="filterCharList(this.value)">':''}
+      <div class="clm-chips" id="clm-chips">${chipsHtml}</div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+function closeCharList(){
+  const m=document.getElementById('charlist-modal');
+  if(m) m.remove();
+}
+function filterCharList(q){
+  const container=document.getElementById('clm-chips');
+  if(!container) return;
+  const chips=container.querySelectorAll('.clm-chip');
+  q=q.trim().toLowerCase();
+  chips.forEach(chip=>{
+    const c=chip.dataset.char||'';
+    const py=(chip.dataset.py||'').toLowerCase();
+    const lesson=(chip.dataset.lesson||'').toLowerCase();
+    const show=!q||c.includes(q)||py.includes(q)||lesson.includes(q);
+    chip.style.display=show?'':'none';
+  });
+}
 
 // ── Wrong character detail modal ──
 let _wrongModalChar=null;
