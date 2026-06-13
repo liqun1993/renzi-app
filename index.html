@@ -662,6 +662,12 @@ function saveState(){localStorage.setItem(STORE_KEY,JSON.stringify(state))}
 let sess=null,screen='home',screenStack=[];
 let zhVoice=null;
 
+// ── Session persistence (断点续学) ──
+const SESS_KEY='renzi_sess_v1';
+function saveSess(){try{if(sess)localStorage.setItem(SESS_KEY,JSON.stringify({screen:screen,sess:sess}))}catch(e){}}
+function restoreSess(lessonId){try{const d=JSON.parse(localStorage.getItem(SESS_KEY));if(d&&d.sess&&d.sess.lessonId===lessonId&&d.sess.idx<d.sess.chars.length)return d}catch(e){}return null}
+function clearSess(){try{localStorage.removeItem(SESS_KEY)}catch(e){}}
+
 // ═══════════════════════════════════════════
 // SPEECH
 // ═══════════════════════════════════════════
@@ -698,8 +704,8 @@ function getWrongChars(){return Object.entries(state.wrong).map(([c,i])=>({char:
 // ═══════════════════════════════════════════
 // NAV
 // ═══════════════════════════════════════════
-function navigate(to,push=true){if(push&&screen!==to)screenStack.push(screen);screen=to;render()}
-function goBack(){if(screenStack.length){screen=screenStack.pop();render()}else navigate('home',false)}
+function navigate(to,push=true){if(push&&screen!==to)screenStack.push(screen);if(sess&&(screen==='card'||screen==='wrongPractice'||screen==='test'))saveSess();screen=to;render()}
+function goBack(){if(screenStack.length){if(sess&&(screen==='card'||screen==='wrongPractice'||screen==='test'))saveSess();screen=screenStack.pop();render()}else navigate('home',false)}
 
 // ═══════════════════════════════════════════
 // RENDER
@@ -857,16 +863,22 @@ function renderWrong(el,t,b){
 // ACTIONS
 // ═══════════════════════════════════════════
 function startLesson(id){
+  const saved=restoreSess(id);
+  if(saved){sess=saved.sess;navigate(saved.screen||'card');return}
   const l=LESSONS.find(x=>x.id===id);if(!l)return;
   sess={lessonId:id,lessonName:l.name,chars:shuffle(l.chars),idx:0,correct:0,wrong:[],showBack:false};
   navigate('card');
 }
 function startAll(){
+  const saved=restoreSess('all');
+  if(saved){sess=saved.sess;navigate(saved.screen||'card');return}
   const all=LESSONS.flatMap(l=>l.chars);
   sess={lessonId:'all',lessonName:'全部字卡',chars:shuffle(all),idx:0,correct:0,wrong:[],showBack:false};
   navigate('card');
 }
 function startWrongPractice(){
+  const saved=restoreSess('wrong');
+  if(saved){sess=saved.sess;navigate(saved.screen||'wrongPractice');return}
   const wc=getWrongChars();if(!wc.length)return;
   sess={lessonId:'wrong',lessonName:'错字复习',chars:shuffle(wc.map(w=>[w.char,w.pinyin])),idx:0,correct:0,wrong:[],showBack:false};
   navigate('wrongPractice');
@@ -895,6 +907,8 @@ function renderDanaoLessons(el,t){
   el.innerHTML=h;
 }
 function startAllDanao(){
+  const saved=restoreSess('danaoAll');
+  if(saved){sess=saved.sess;navigate(saved.screen||'card');return}
   const all=LESSONS.filter(l=>l.group==='全脑识字（大班）').flatMap(l=>l.chars);
   sess={lessonId:'danaoAll',lessonName:'全脑识字·全部',chars:shuffle(all),idx:0,correct:0,wrong:[],showBack:false};
   navigate('card');
@@ -934,8 +948,10 @@ function markCard(ok){
   setTimeout(()=>{
     sess.idx++;sess.showBack=false;
     if(sess.idx>=sess.chars.length){
+      clearSess();
       navigate(isTest?'testResult':screen==='wrongPractice'?'wrongResult':'result');
     } else {
+      saveSess();
       render();
       // Slide-in animation for new card
       const newCard=document.querySelector('.flashcard');
@@ -943,7 +959,7 @@ function markCard(ok){
     }
   },280);
 }
-function retryLesson(){if(!sess)return;sess.lessonId==='all'?startAll():startLesson(sess.lessonId)}
+function retryLesson(){if(!sess)return;clearSess();sess.lessonId==='all'?startAll():sess.lessonId==='danaoAll'?startAllDanao():startLesson(sess.lessonId)}
 function nextCard(){
   if(!sess)return;
   const cardEl=document.querySelector('.flashcard');
@@ -952,8 +968,10 @@ function nextCard(){
     sess.idx++;sess.showBack=false;
     const isTest=screen==='test';
     if(sess.idx>=sess.chars.length){
+      clearSess();
       navigate(isTest?'testResult':screen==='wrongPractice'?'wrongResult':'result');
     } else {
+      saveSess();
       render();
       const newCard=document.querySelector('.flashcard');
       if(newCard) newCard.classList.add('slide-in-right');
@@ -966,12 +984,13 @@ function prevCard(){
   if(cardEl) cardEl.classList.add('slide-out-left');
   setTimeout(()=>{
     sess.idx--;sess.showBack=false;
+    saveSess();
     render();
     const newCard=document.querySelector('.flashcard');
     if(newCard) newCard.classList.add('slide-in-left');
   },280);
 }
-function retryWrong(){if(!sess||!sess.wrong.length)return;const w=sess.wrong;sess={lessonId:sess.lessonId,lessonName:(sess.lessonName||'')+'·错字',chars:shuffle(w),idx:0,correct:0,wrong:[],showBack:false};navigate('card')}
+function retryWrong(){if(!sess||!sess.wrong.length)return;clearSess();const w=sess.wrong;sess={lessonId:sess.lessonId,lessonName:(sess.lessonName||'')+'·错字',chars:shuffle(w),idx:0,correct:0,wrong:[],showBack:false};navigate('card')}
 function removeWrong(c){delete state.wrong[c];saveState();render()}
 function clearWrong(){if(confirm('确定清空所有错字吗？')){state.wrong={};saveState();render()}}
 
@@ -1110,6 +1129,8 @@ function replayModalStroke(){
 const TEST_SIZE = 30; // number of characters to sample
 
 function startTest(){
+  const saved=restoreSess('test');
+  if(saved){sess=saved.sess;navigate(saved.screen||'test');return}
   const all = LESSONS.flatMap(l => l.chars);
   const sampled = shuffle(all).slice(0, TEST_SIZE);
   sess = {
