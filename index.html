@@ -3617,10 +3617,34 @@ cleanupState();
 function migrateStarted(){
   if(!state.started) state.started={};
   if(Object.keys(state.started).length===0 && (Object.keys(state.learned).length>0 || Object.keys(state.wrong).length>0)){
-    const known=new Set([...Object.keys(state.learned),...Object.keys(state.wrong)]);
-    LESSONS.forEach(l=>{
-      const hit=l.chars.some(([c])=>known.has(c));
-      if(hit) state.started[l.id]=true;
+    var learnedSet=new Set(Object.keys(state.learned));
+    var wrongSet=new Set(Object.keys(state.wrong));
+    var known=new Set([...learnedSet,...wrongSet]);
+    var MAIN_GROUPS=['识字','课文'];
+    // 第一轮：标记主课文（识字/课文）——任意汉字命中即算已开始
+    LESSONS.forEach(function(l){
+      if(MAIN_GROUPS.indexOf(l.group)!==-1 && l.chars.some(function(c){return known.has(c[0])})){
+        state.started[l.id]=true;
+      }
+    });
+    // 收集主课文已覆盖的汉字
+    var covered=new Set();
+    LESSONS.forEach(function(l){
+      if(state.started[l.id] && MAIN_GROUPS.indexOf(l.group)!==-1){
+        l.chars.forEach(function(c){covered.add(c[0])});
+      }
+    });
+    // 第二轮：非主课文组——需要强证据才标记已开始
+    // 条件：有"不会"的字且不全来自主课文，或本课独有已学字>=3个
+    LESSONS.forEach(function(l){
+      if(state.started[l.id] || MAIN_GROUPS.indexOf(l.group)!==-1) return;
+      var wrongInLesson=l.chars.filter(function(c){return wrongSet.has(c[0])});
+      var newWrong=wrongInLesson.filter(function(c){return !covered.has(c[0])});
+      var learnedInLesson=l.chars.filter(function(c){return learnedSet.has(c[0])});
+      var newLearned=learnedInLesson.filter(function(c){return !covered.has(c[0])});
+      if(newWrong.length>0 || newLearned.length>=3){
+        state.started[l.id]=true;
+      }
     });
     saveState();
   }
