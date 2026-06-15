@@ -3649,6 +3649,30 @@ function migrateStarted(){
     saveState();
   }
 }
+function cleanupFalseStarted(){
+  if(state._migV) return;
+  state._migV=1;
+  if(!state.started||Object.keys(state.started).length===0){saveState();return}
+  var learnedSet=new Set(Object.keys(state.learned));
+  var wrongSet=new Set(Object.keys(state.wrong));
+  var MAIN_GROUPS=['识字','课文'];
+  var covered=new Set();
+  LESSONS.forEach(function(l){
+    if(state.started[l.id] && MAIN_GROUPS.indexOf(l.group)!==-1)
+      l.chars.forEach(function(c){covered.add(c[0])});
+  });
+  var changed=false;
+  LESSONS.forEach(function(l){
+    if(!state.started[l.id] || MAIN_GROUPS.indexOf(l.group)!==-1) return;
+    var newWrong=l.chars.filter(function(c){return wrongSet.has(c[0])&&!covered.has(c[0])});
+    var newLearned=l.chars.filter(function(c){return learnedSet.has(c[0])&&!covered.has(c[0])});
+    if(newWrong.length===0 && newLearned.length<3){
+      delete state.started[l.id];changed=true;
+    }
+  });
+  if(changed) saveState();
+}
+cleanupFalseStarted();
 migrateStarted();
 
 // ── INIT ──
