@@ -3613,6 +3613,20 @@ function cleanupState(){
 }
 cleanupState();
 
+// ── MIGRATION: 旧用户 started 字段迁移 ──
+function migrateStarted(){
+  if(!state.started) state.started={};
+  if(Object.keys(state.started).length===0 && (Object.keys(state.learned).length>0 || Object.keys(state.wrong).length>0)){
+    const known=new Set([...Object.keys(state.learned),...Object.keys(state.wrong)]);
+    LESSONS.forEach(l=>{
+      const hit=l.chars.some(([c])=>known.has(c));
+      if(hit) state.started[l.id]=true;
+    });
+    saveState();
+  }
+}
+migrateStarted();
+
 // ── INIT ──
 initVoice();
 render();
@@ -3808,9 +3822,11 @@ async function cloudLoad(){
         if(cloud.version===2){
           state.learned=cloud.learned||{};
           state.wrong=cloud.wrong||{};
+          state.started=cloud.started||{};
           state.testHistory=cloud.testHistory||[];
           saveState();
           cleanupState();
+          migrateStarted();
           render();
         }
       } else if(localLearned>0&&cloudLearned===0){
