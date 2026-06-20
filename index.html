@@ -966,8 +966,8 @@ function renderHome(el,t){
 function _renderLiteracyHome(){
   var lc=learnedCount(),wc=wrongCount(),tc=totalChars();
   var _dls=LESSONS.filter(function(l){return l.group==='全脑识字（大班）'});
-  var _dAll=_dls.reduce(function(s,l){return s+l.chars.length},0);
   var _dSet={};_dls.forEach(function(l){l.chars.forEach(function(c){_dSet[c[0]]=1})});
+  var _dAll=Object.keys(_dSet).length;
   var _dLearned=0,_dWrong=0;
   for(var c in _dSet){if(state.learned[c])_dLearned++;if(state.wrong[c])_dWrong++}
   var _dPending=_dAll-_dLearned-_dWrong;if(_dPending<0)_dPending=0;
@@ -1165,16 +1165,16 @@ function renderDanaoLessons(el,t){
   const ds=LESSONS.filter(l=>l.group==='全脑识字（大班）');
   const totalDanao=danaoCharCount();
 
-  // 计算复习进度和正确率（仅统计已开始的课程）
+  // 计算复习进度和正确率（仅统计已开始的课程，去重）
   const startedDs=ds.filter(l=>state.started[l.id]);
-  const allDanaoChars=startedDs.flatMap(l=>l.chars.map(c=>c[0]));
+  const allDanaoChars=[...new Set(startedDs.flatMap(l=>l.chars.map(c=>c[0])))];
   const reviewedChars=allDanaoChars.filter(c=>state.learned[c]||state.wrong[c]);
   const learnedDanao=allDanaoChars.filter(c=>state.learned[c]);
   const wrongDanao=allDanaoChars.filter(c=>state.wrong[c]);
   const reviewedCount=reviewedChars.length;
   const learnedCount=learnedDanao.length;
   const wrongCount=wrongDanao.length;
-  const startedCharCount=startedDs.reduce((s,l)=>s+l.chars.length,0);
+  const startedCharCount=allDanaoChars.length;
   const progressPct=startedCharCount?Math.round(reviewedCount/startedCharCount*100):0;
   const accuracyPct=reviewedCount?Math.round(learnedCount/reviewedCount*100):0;
 
