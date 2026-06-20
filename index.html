@@ -26,7 +26,11 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 .home-btns{display:flex;flex-direction:column;gap:14px;padding:0 12px}
 .btn-main{display:flex;align-items:center;gap:14px;padding:18px 22px;border-radius:20px;border:none;font-size:18px;font-weight:700;cursor:pointer;transition:transform .15s}
 .btn-main:active{transform:scale(.97)}
-.btn-learn{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;box-shadow:0 4px 15px rgba(102,126,234,.4)}
+.tb-tab-bar{display:flex;gap:6px;margin-bottom:16px}
+.tb-tab{flex:1;padding:12px 0;text-align:center;border-radius:14px;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.tb-tab.active{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;box-shadow:0 4px 12px rgba(102,126,234,.3)}
+.tb-tab:not(.active){background:#fff;color:#667eea;border-color:#e2e8f0}
+.btn-textbook{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;box-shadow:0 4px 15px rgba(102,126,234,.4)}
 .btn-wrong{background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;box-shadow:0 4px 15px rgba(245,87,108,.3)}
 .btn-test{background:linear-gradient(135deg,#38b2ac,#2d9cdb);color:#fff;box-shadow:0 4px 15px rgba(56,178,172,.35)}
 .btn-danao{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;box-shadow:0 4px 15px rgba(243,156,18,.35)}
@@ -934,6 +938,7 @@ function render(){
   switch(screen){
     case'home':renderHome(scr,title);break;
     case'lessons':renderLessons(scr,title);break;
+    case'textbookLessons':renderTextbookLessons(scr,title);break;
     case'danaoLessons':renderDanaoLessons(scr,title);break;
     case'myStories':renderMyStories(scr,title);break;
     case'mathPractice':_renderMathPractice(scr,title);break;
@@ -973,7 +978,7 @@ function _renderLiteracyHome(){
     '<div class="stat-box" onclick="showCharList(\'wrong\')" style="color:'+(wc?'#e53e3e':'#38a169')+'"><div class="stat-num" style="color:'+(wc?'#e53e3e':'#38a169')+'">'+wc+'</div><div class="stat-label">不会的</div></div>'+
     '</div>'+
     '<div class="home-btns">'+
-    '<button class="btn-main btn-learn" onclick="navigate(\'lessons\')"><span class="ico">✏️</span><span class="txt">开始认字<small>选一课开始学习</small></span></button>'+
+    '<button class="btn-main btn-learn" onclick="navigate(\'textbookLessons\')"><span class="ico">✏️</span><span class="txt">一年级课本学习<small>部编版一年级上册</small></span></button>'+
     '<button class="btn-main btn-wrong" onclick="navigate(\'wrong\')"><span class="ico">🔁</span><span class="txt">复习错字<small>'+wc+'个字需要复习</small></span></button>'+
     '<button class="btn-main btn-danao" onclick="navigate(\'danaoLessons\')"><span class="ico">🧠</span><span class="txt">全脑识字（大班）复习<small>共'+_dAll+'字 · ✅'+_dLearned+'已学会 · ❌'+_dWrong+'不会 · 📖'+_dPending+'待复习</small></span></button>'+
     '<button class="btn-main btn-my-stories" onclick="navigate(\'myStories\')"><span class="ico">📚</span><span class="txt">奕辰的故事书<small>用已学的字写的小故事</small></span></button>'+
@@ -996,6 +1001,38 @@ function renderLessons(el,t){
         <div class="lc-badge ${bc}">${bt}</div></div>`;
     });h+=`</div>`;
   }el.innerHTML=h;
+}
+var _tbTab='shengzi';
+function renderTextbookLessons(el,t){
+  t.textContent='一年级课本学习';
+  var h='<div class="tb-tab-bar anim-in">';
+  h+='<div class="tb-tab'+(_tbTab==='shengzi'?' active':'')+'" onclick="_tbTab=\'shengzi\';render()">📝 生字学习</div>';
+  h+='<div class="tb-tab'+(_tbTab==='kewen'?' active':'')+'" onclick="_tbTab=\'kewen\';render()">📖 课文学习</div>';
+  h+='</div>';
+  var group=_tbTab==='shengzi'?'识字':'课文';
+  var ls=LESSONS.filter(function(l){return l.group===group});
+  var totalC=_dedupChars(ls.flatMap(function(l){return l.chars})).length;
+  var startedLs=ls.filter(function(l){return state.started[l.id]});
+  var learnedC=_dedupChars(startedLs.flatMap(function(l){return l.chars})).filter(function(c){return state.learned[c[0]]}).length;
+  var wrongC=_dedupChars(startedLs.flatMap(function(l){return l.chars})).filter(function(c){return state.wrong[c[0]]}).length;
+  h+='<div class="anim-in" style="background:#f7fafc;border-radius:16px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-around;text-align:center">';
+  h+='<div><div style="font-size:22px;font-weight:800;color:#667eea">'+totalC+'</div><div style="font-size:11px;color:#a0aec0">总字数</div></div>';
+  h+='<div><div style="font-size:22px;font-weight:800;color:#38a169">'+learnedC+'</div><div style="font-size:11px;color:#a0aec0">已学会</div></div>';
+  h+='<div><div style="font-size:22px;font-weight:800;color:'+(wrongC?'#e53e3e':'#a0aec0')+'">'+wrongC+'</div><div style="font-size:11px;color:#a0aec0">不会的</div></div>';
+  h+='</div>';
+  h+='<div class="lesson-grid">';
+  ls.forEach(function(l){
+    var tot=l.chars.length,w=l.chars.filter(function(c){return state.wrong[c[0]]}).length,lr=l.chars.filter(function(c){return state.learned[c[0]]}).length;
+    var started=state.started[l.id];
+    var bc='lc-new',bt='未学';
+    if(started){if(w>0){bc='lc-part';bt=w+'个不会'}else if(lr===tot){bc='lc-done';bt='已学会'}}
+    h+='<div class="lesson-card anim-in" onclick="startLesson(\''+l.id+'\')">';
+    h+='<div class="lc-icon" style="background:'+l.color+'">'+l.name[0]+'</div>';
+    h+='<div class="lc-info"><div class="lc-name">'+l.name+'</div><div class="lc-chars">'+l.chars.slice(0,8).map(function(c){return c[0]}).join(' ')+(tot>8?' ...':'')+'</div></div>';
+    h+='<div class="lc-badge '+bc+'">'+bt+'</div></div>';
+  });
+  h+='</div>';
+  el.innerHTML=h;
 }
 
 function renderCard(el,t){
