@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>认字小能手</title>
+<title>黄奕辰的学习小天地</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#f0f4ff}
@@ -31,6 +31,37 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 .btn-test{background:linear-gradient(135deg,#38b2ac,#2d9cdb);color:#fff;box-shadow:0 4px 15px rgba(56,178,172,.35)}
 .btn-danao{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;box-shadow:0 4px 15px rgba(243,156,18,.35)}
 .btn-test2500{background:linear-gradient(135deg,#00b894,#00cec9);color:#fff;box-shadow:0 4px 15px rgba(0,184,148,.35)}
+.btn-my-stories{background:linear-gradient(135deg,#e056a0,#f093fb);color:#fff;box-shadow:0 4px 15px rgba(224,86,160,.35)}
+.story-card{background:#fff;border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 2px 16px rgba(0,0,0,.07);position:relative;overflow:hidden}
+.story-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;border-radius:4px 0 0 4px}
+.story-card.s-pink::before{background:linear-gradient(180deg,#f093fb,#f5576c)}
+.story-card.s-blue::before{background:linear-gradient(180deg,#667eea,#764ba2)}
+.story-card.s-green::before{background:linear-gradient(180deg,#38a169,#68d391)}
+.story-card.s-orange::before{background:linear-gradient(180deg,#ed8936,#f6ad55)}
+.story-card.s-purple::before{background:linear-gradient(180deg,#9f7aea,#b794f4)}
+.story-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.story-head .s-emoji{font-size:32px}
+.story-head .s-title{font-size:17px;font-weight:800;color:#2d3748}
+.story-head .s-badge{font-size:11px;background:#edf2f7;color:#718096;padding:2px 8px;border-radius:10px;margin-left:auto}
+.story-body{font-size:16px;line-height:2.2;color:#4a5568;text-indent:2em}
+.story-body .shl{color:#e056a0;font-weight:700;background:#fdf2f8;padding:1px 3px;border-radius:4px}
+.story-chars{margin-top:12px;padding-top:10px;border-top:1px dashed #e2e8f0}
+.story-chars .sc-label{font-size:11px;color:#a0aec0;margin-bottom:4px}
+.story-chars .sc-list{font-size:14px;color:#e056a0;letter-spacing:1px;line-height:1.8}
+.theme-group{margin-bottom:16px}
+.theme-tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;margin-bottom:8px}
+.sent-card{background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 8px rgba(0,0,0,.05);display:flex;align-items:flex-start;gap:10px}
+.sent-card .se{font-size:22px;flex-shrink:0;margin-top:2px}
+.sent-card .st{font-size:15px}
+.sent-card .st .shl{color:#667eea;font-weight:700;background:#eef2ff}
+.char-cloud-box{background:#fff;border-radius:20px;padding:16px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.char-cloud-box .cc-chars{font-size:20px;line-height:2.2;letter-spacing:2px}
+.char-cloud-box .cc-chars span{display:inline-block;padding:2px 4px;margin:2px;border-radius:6px;transition:all .2s;cursor:pointer}
+.char-cloud-box .cc-chars span:hover{background:#667eea;color:#fff;transform:scale(1.15)}
+.story-tab-bar{display:flex;gap:8px;margin-bottom:16px}
+.story-tab{flex:1;padding:10px;text-align:center;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.story-tab.active{background:#e056a0;color:#fff;box-shadow:0 4px 12px rgba(224,86,160,.3)}
+.story-tab:not(.active){background:#fff;color:#e056a0;border-color:#e2e8f0}
 .btn-main .ico{font-size:28px}
 .btn-main .txt{display:flex;flex-direction:column;align-items:flex-start}
 .btn-main .txt small{font-size:12px;font-weight:400;opacity:.8}
@@ -230,7 +261,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang SC","M
 <div id="app">
   <div class="hdr" id="header">
     <span class="back" id="btnBack" style="visibility:hidden" onclick="goBack()">←</span>
-    <span class="title" id="hdrTitle">认字小能手</span>
+    <span class="title" id="hdrTitle">黄奕辰的学习小天地</span>
     <span class="badge" id="hdrBadge"></span>
     <span class="hdr-user hdr-user-off" id="hdrUser" onclick="navigate('auth')">👤</span>
   </div>
@@ -2974,6 +3005,7 @@ function render(){
     case'lessons':renderLessons(scr,title);break;
     case'danaoLessons':renderDanaoLessons(scr,title);break;
     case'test2500Lessons':renderTest2500Lessons(scr,title);break;
+    case'myStories':renderMyStories(scr,title);break;
     case'auth':renderAuth(scr,title);break;
     case'card':case'wrongPractice':case'test':renderCard(scr,title);break;
     case'result':case'wrongResult':renderResult(scr,title,badge);break;
@@ -2983,10 +3015,10 @@ function render(){
 }
 
 function renderHome(el,t){
-  t.textContent='认字小能手';
+  t.textContent='黄奕辰的学习小天地';
   const lc=learnedCount(),wc=wrongCount(),tc=totalChars();
   el.innerHTML=`<div class="home-hero anim-in">
-    <div class="home-emoji">📖</div><div class="home-title">认字小能手</div><div class="home-sub">一年级上册 · 部编版</div>
+    <div class="home-emoji">📖</div><div class="home-title">黄奕辰的学习小天地</div><div class="home-sub">一年级上册 · 部编版</div>
     <div class="home-stats">
       <div class="stat-box" onclick="showCharList('learned')"><div class="stat-num">${lc}</div><div class="stat-label">已认识</div></div>
       <div class="stat-box" onclick="showCharList('all')"><div class="stat-num">${tc}</div><div class="stat-label">总共</div></div>
@@ -2998,6 +3030,7 @@ function renderHome(el,t){
       <button class="btn-main btn-test" onclick="startTest()"><span class="ico">📊</span><span class="txt">识字测评<small>测测大班小朋友认了多少字</small></span></button>
       <button class="btn-main btn-danao" onclick="navigate('danaoLessons')"><span class="ico">🧠</span><span class="txt">全脑识字（大班）复习<small>${danaoCharCount()}个拓展汉字</small></span></button>
       <button class="btn-main btn-test2500" onclick="navigate('test2500Lessons')"><span class="ico">📝</span><span class="txt">儿童识字测试表<small>${test2500CharCount()}个常用汉字</small></span></button>
+      <button class="btn-main btn-my-stories" onclick="navigate('myStories')"><span class="ico">📚</span><span class="txt">奕辰的故事书<small>用已学的字写的小故事</small></span></button>
     </div></div>`;
 }
 
@@ -3351,6 +3384,148 @@ function markCard(ok){
       if(newCard) newCard.classList.add('slide-in-right');
     }
   },280);
+}
+// ── 奕辰的故事书 ──
+var _storiesTab='sentences';
+function _hl(t){return '<span class="shl">'+t+'</span>'}
+function renderMyStories(el,t){
+  t.textContent='奕辰的故事书';
+  var lc=learnedCount(),wc=wrongCount();
+  var h='<div style="text-align:center;margin-bottom:16px" class="anim-in">';
+  h+='<div style="font-size:48px;margin-bottom:4px">📚</div>';
+  h+='<div style="font-size:20px;font-weight:800;color:#2d3748">奕辰的故事书</div>';
+  h+='<div style="font-size:13px;color:#718096;margin-top:4px">用已学的'+lc+'个字写的小故事</div></div>';
+
+  h+='<div class="story-tab-bar anim-in">';
+  h+='<div class="story-tab'+(_storiesTab==='sentences'?' active':'')+'" onclick="_storiesTab=\'sentences\';render()">主题组句</div>';
+  h+='<div class="story-tab'+(_storiesTab==='stories'?' active':'')+'" onclick="_storiesTab=\'stories\';render()">小故事</div>';
+  h+='<div class="story-tab'+(_storiesTab==='cloud'?' active':'')+'" onclick="_storiesTab=\'cloud\';render()">汉字云</div>';
+  h+='</div>';
+
+  if(_storiesTab==='sentences') h+=_renderSentences();
+  else if(_storiesTab==='stories') h+=_renderStories();
+  else h+=_renderCharCloud();
+
+  el.innerHTML=h;
+}
+function _renderSentences(){
+  var h='';
+  // 自然与天气
+  h+='<div class="theme-group anim-in"><div class="theme-tag" style="background:#38a169">自然与天气</div>';
+  h+='<div class="sent-card"><span class="se">☁️</span><div class="st">天上的'+_hl('白')+_hl('云')+'像棉花。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌅</span><div class="st">太阳从'+_hl('东')+'方升起。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌬️</span><div class="st">大'+_hl('风')+'把树叶吹走了。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌧️</span><div class="st">雨'+_hl('滴')+'从窗户上滑下来。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌊</span><div class="st">'+_hl('海')+'是蓝色的。</div></div>';
+  h+='<div class="sent-card"><span class="se">💧</span><div class="st">'+_hl('泉')+'水清清凉。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌿</span><div class="st">草地'+_hl('碧')+_hl('绿')+'碧绿的。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌙</span><div class="st">'+_hl('弯')+_hl('弯')+'的月儿像小船。</div></div>';
+  h+='<div class="sent-card"><span class="se">⭐</span><div class="st">天上有'+_hl('一')+_hl('千')+'颗星星。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌸</span><div class="st">'+_hl('露')+'水——早上草叶上有露水。</div></div>';
+  h+='</div>';
+  // 小动物
+  h+='<div class="theme-group anim-in"><div class="theme-tag" style="background:#e67e22">小动物</div>';
+  h+='<div class="sent-card"><span class="se">🐦</span><div class="st">'+_hl('小')+'鸟在树上唱歌。</div></div>';
+  h+='<div class="sent-card"><span class="se">🦋</span><div class="st">'+_hl('蝴')+_hl('蝶')+'在花丛中飞。</div></div>';
+  h+='<div class="sent-card"><span class="se">🐝</span><div class="st">'+_hl('小')+_hl('蜜')+'蜂在采花蜜。</div></div>';
+  h+='<div class="sent-card"><span class="se">🐟</span><div class="st">'+_hl('小')+_hl('鱼')+'在水里游。</div></div>';
+  h+='<div class="sent-card"><span class="se">🐑</span><div class="st">'+_hl('小')+_hl('羊')+'在草地上吃草。</div></div>';
+  h+='<div class="sent-card"><span class="se">🐷</span><div class="st">'+_hl('小')+_hl('猪')+'胖嘟嘟的真可爱。</div></div>';
+  h+='<div class="sent-card"><span class="se">🦊</span><div class="st">'+_hl('小')+_hl('狸')+'住在森林里。</div></div>';
+  h+='<div class="sent-card"><span class="se">🐴</span><div class="st">'+_hl('小')+_hl('驴')+'在草地上吃草。</div></div>';
+  h+='<div class="sent-card"><span class="se">🐦‍⬛</span><div class="st">树上有一只'+_hl('乌')+_hl('鸦')+'。</div></div>';
+  h+='<div class="sent-card"><span class="se">🦐</span><div class="st">'+_hl('小')+_hl('虾')+'在水里游来游去。</div></div>';
+  h+='<div class="sent-card"><span class="se">🐉</span><div class="st">'+_hl('小')+_hl('蜻')+_hl('蜓')+'在花上飞。</div></div>';
+  h+='<div class="sent-card"><span class="se">🐱</span><div class="st">小猫'+_hl('眯')+'着眼'+_hl('笑眯眯')+'地看着我。</div></div>';
+  h+='</div>';
+  // 日常生活
+  h+='<div class="theme-group anim-in"><div class="theme-tag" style="background:#9b59b6">日常生活</div>';
+  h+='<div class="sent-card"><span class="se">🍚</span><div class="st">该'+_hl('吃')+'饭了，快洗手。</div></div>';
+  h+='<div class="sent-card"><span class="se">🥣</span><div class="st">今天的'+_hl('汤')+'真好喝。</div></div>';
+  h+='<div class="sent-card"><span class="se">💧</span><div class="st">运动后要多'+_hl('喝')+'水。</div></div>';
+  h+='<div class="sent-card"><span class="se">🧼</span><div class="st">每天早上要洗'+_hl('脸')+'。</div></div>';
+  h+='<div class="sent-card"><span class="se">😴</span><div class="st">睡觉要'+_hl('闭')+'上眼睛。</div></div>';
+  h+='<div class="sent-card"><span class="se">🏠</span><div class="st">妈妈在'+_hl('厨')+'房做饭。</div></div>';
+  h+='<div class="sent-card"><span class="se">📚</span><div class="st">'+_hl('放')+'学了回家吧。</div></div>';
+  h+='<div class="sent-card"><span class="se">👋</span><div class="st">'+_hl('再见')+'，明天见！</div></div>';
+  h+='<div class="sent-card"><span class="se">🧹</span><div class="st">我帮妈妈'+_hl('拖')+'地。</div></div>';
+  h+='</div>';
+  // 校园与学习
+  h+='<div class="theme-group anim-in"><div class="theme-tag" style="background:#3498db">校园与学习</div>';
+  h+='<div class="sent-card"><span class="se">🏫</span><div class="st">我们在'+_hl('教')+'室里上课。</div></div>';
+  h+='<div class="sent-card"><span class="se">👦</span><div class="st">'+_hl('同')+'学们好！</div></div>';
+  h+='<div class="sent-card"><span class="se">🚩</span><div class="st">每天早上要'+_hl('升')+_hl('国')+_hl('旗')+'。</div></div>';
+  h+='<div class="sent-card"><span class="se">✏️</span><div class="st">我正在写作业。</div></div>';
+  h+='<div class="sent-card"><span class="se">📖</span><div class="st">我在学写'+_hl('汉')+'字。</div></div>';
+  h+='<div class="sent-card"><span class="se">👏</span><div class="st">大家一起'+_hl('拍')+'拍手。</div></div>';
+  h+='<div class="sent-card"><span class="se">🎨</span><div class="st">我喜欢'+_hl('折')+'纸飞机。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌱</span><div class="st">春天一起'+_hl('栽')+'小树。</div></div>';
+  h+='<div class="sent-card"><span class="se">⭐</span><div class="st">你今天表现真'+_hl('棒')+'。</div></div>';
+  h+='</div>';
+  // 花果与植物
+  h+='<div class="theme-group anim-in"><div class="theme-tag" style="background:#f39c12">花果与植物</div>';
+  h+='<div class="sent-card"><span class="se">🍑</span><div class="st">'+_hl('桃')+'子甜甜的真好吃。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌷</span><div class="st">'+_hl('莲')+'花开了真好看。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌳</span><div class="st">大'+_hl('树')+'下很凉快。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌿</span><div class="st">'+_hl('小')+_hl('苗')+'在阳光里长大。</div></div>';
+  h+='<div class="sent-card"><span class="se">🥬</span><div class="st">多吃'+_hl('蔬')+'菜身体好。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌺</span><div class="st">不要随便'+_hl('摘')+'花哦。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌲</span><div class="st">'+_hl('森')+'林里住着小动物。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌾</span><div class="st">秋天的稻田'+_hl('金')+'灿灿。</div></div>';
+  h+='<div class="sent-card"><span class="se">💜</span><div class="st">这朵花是'+_hl('紫')+'色的。</div></div>';
+  h+='<div class="sent-card"><span class="se">🌻</span><div class="st">春天到了去'+_hl('种')+'花。</div></div>';
+  h+='</div>';
+  return h;
+}
+function _renderStories(){
+  var h='';
+  // 故事1: 春天来了
+  h+='<div class="story-card s-green anim-in"><div class="story-head"><span class="s-emoji">🌸</span><span class="s-title">春天来了</span><span class="s-badge">28个已学字</span></div>';
+  h+='<div class="story-body">春天来了，我和'+_hl('兄')+'哥一起去'+_hl('公')+'园玩。公园里有好多'+_hl('树')+'，'+_hl('树')+'上开满了'+_hl('碧')+'绿的花。'+_hl('蝴')+_hl('蝶')+'在花丛中飞，小'+_hl('蜜')+'蜂忙着采花'+_hl('蜜')+'。天上的'+_hl('白')+_hl('云')+'好像棉花，'+_hl('风')+'儿轻轻吹。'+_hl('小')+'鸟在唱歌，真好听。我们在草地上'+_hl('做')+'游戏，'+_hl('快')+_hl('乐')+'极了！太阳从'+_hl('东')+'方'+_hl('升')+'起，'+_hl('金')+'色的阳光照在我们'+_hl('脸')+'上，真'+_hl('美')+'。</div>';
+  h+='<div class="story-chars"><div class="sc-label">本故事用到的已学汉字：</div><div class="sc-list">兄 公 树 碧 蝴 蝶 蜜 白 云 风 小 做 快 乐 东 升 金 脸 美</div></div></div>';
+
+  // 故事2: 爷爷的小花园
+  h+='<div class="story-card s-blue anim-in"><div class="story-head"><span class="s-emoji">👴</span><span class="s-title">爷爷的小花园</span><span class="s-badge">30个已学字</span></div>';
+  h+='<div class="story-body">我的爷爷是一位老'+_hl('翁')+'，他有一个'+_hl('美')+_hl('丽')+'的小花园。春天，爷爷'+_hl('栽')+'了好多'+_hl('小')+_hl('树')+'和花'+_hl('苗')+'。'+_hl('夏')+'天到了，'+_hl('桃')+'树上结了大'+_hl('桃')+'子，甜甜的，真好吃！秋天，'+_hl('树')+'叶'+_hl('掉')+'下来了，'+_hl('金')+'色的叶子好像'+_hl('蝴')+_hl('蝶')+'在飞。爷爷'+_hl('用')+_hl('小')+_hl('刀')+'做了一个'+_hl('扁')+'担，'+_hl('把')+'水浇到花园里。爷爷说："要保'+_hl('护')+'花草，不能'+_hl('乱')+_hl('摘')+'花。"爷爷真'+_hl('棒')+'！</div>';
+  h+='<div class="story-chars"><div class="sc-label">本故事用到的已学汉字：</div><div class="sc-list">翁 美 丽 栽 小 树 苗 夏 桃 掉 金 蝴 蝶 用 刀 扁 把 护 乱 摘 棒</div></div></div>';
+
+  // 故事3: 小猪吃桃子
+  h+='<div class="story-card s-pink anim-in"><div class="story-head"><span class="s-emoji">🐷</span><span class="s-title">小猪吃桃子</span><span class="s-badge">29个已学字</span></div>';
+  h+='<div class="story-body">'+_hl('森')+'林里住着一只'+_hl('小')+_hl('猪')+'。有一天，小'+_hl('猪')+'在'+_hl('树')+'下找到了好多'+_hl('桃')+'子，吃得太'+_hl('快')+'了，'+_hl('嘴')+'巴上都是'+_hl('桃')+'子的汁。小猪的肚子'+_hl('生')+_hl('病')+'了，好'+_hl('害')+_hl('怕')+'！'+_hl('小')+_hl('羊')+'来看小猪，'+_hl('拉')+'着小猪去'+_hl('见')+'山羊'+_hl('翁')+'。山羊翁说："吃'+_hl('东')+_hl('西')+'要慢一点，多'+_hl('喝')+'水，多吃'+_hl('蔬')+'菜，不要乱吃。"小猪听了，'+_hl('以')+'后再也不乱吃了。小'+_hl('猪')+_hl('想')+'：以后一定要保'+_hl('护')+'好自己的小肚子！</div>';
+  h+='<div class="story-chars"><div class="sc-label">本故事用到的已学汉字：</div><div class="sc-list">森 小 猪 树 桃 快 嘴 病 害 怕 羊 拉 见 翁 东 喝 蔬 想 护</div></div></div>';
+
+  // 故事4: 孙悟空来了
+  h+='<div class="story-card s-orange anim-in"><div class="story-head"><span class="s-emoji">🐒</span><span class="s-title">孙悟空来了</span><span class="s-badge">32个已学字</span></div>';
+  h+='<div class="story-body">有一天，孙'+_hl('悟')+_hl('空')+'从天上飞下来了！他'+_hl('想')+'和我'+_hl('做')+'朋友。我们一起去'+_hl('海')+'边玩。'+_hl('海')+'里有好多'+_hl('鱼')+'和小'+_hl('虾')+'，还有小'+_hl('蜻')+_hl('蜓')+'在海面上飞。悟空用'+_hl('手')+_hl('抓')+'了一把沙，'+_hl('做')+'了一个小'+_hl('猪')+'。我'+_hl('用')+'树叶'+_hl('做')+'了一个小'+_hl('扁')+'舟，'+_hl('放')+'到水里。小'+_hl('鱼')+'游过来'+_hl('追')+'小舟，小'+_hl('虾')+'躲在下面。小'+_hl('驴')+'在海边吃草。太阳'+_hl('下')+'山了，我们'+_hl('手')+_hl('拉')+_hl('手')+'回家了。妈妈说："今晚做'+_hl('蔬')+'菜和'+_hl('鱼')+_hl('汤')+'。"哥哥说："真好吃！"</div>';
+  h+='<div class="story-chars"><div class="sc-label">本故事用到的已学汉字：</div><div class="sc-list">悟 空 想 做 海 鱼 虾 蜻 蜓 手 抓 猪 用 扁 放 追 驴 下 拉 蔬 汤</div></div></div>';
+
+  // 故事5: 快乐的节日
+  h+='<div class="story-card s-purple anim-in"><div class="story-head"><span class="s-emoji">🎉</span><span class="s-title">快乐的节日</span><span class="s-badge">33个已学字</span></div>';
+  h+='<div class="story-body">'+_hl('元')+'旦到了，'+_hl('国')+_hl('庆')+_hl('节')+'也来了！'+_hl('公')+'园里挂了红红的'+_hl('旗')+'，放了好看的'+_hl('烟')+'花。我和'+_hl('同')+'学们一起去'+_hl('公')+'园玩。公园里有好多小动物——'+_hl('小')+_hl('羊')+'在吃草，小'+_hl('猪')+'在睡觉，小'+_hl('鸟')+'在唱歌。我们'+_hl('拍')+'手'+_hl('欢')+'呼，'+_hl('做')+'了好多游戏。妈妈'+_hl('做')+'了好吃的菜，有'+_hl('蔬')+'菜、有'+_hl('鱼')+'、还有'+_hl('汤')+'。'+_hl('吃')+'完饭，我帮妈妈'+_hl('拖')+'地、擦桌子。妈妈说我'+_hl('真')+_hl('棒')+'。这个'+_hl('节')+_hl('日')+'真'+_hl('快')+_hl('乐')+'！我'+_hl('愿')+'意天天过'+_hl('节')+'！</div>';
+  h+='<div class="story-chars"><div class="sc-label">本故事用到的已学汉字：</div><div class="sc-list">元 国 庆 节 公 旗 烟 同 小 羊 猪 鸟 拍 欢 做 蔬 鱼 汤 吃 拖 真 棒 快 乐 愿 日</div></div></div>';
+
+  // 待加强汉字
+  var wrongKeys=Object.keys(state.wrong||{});
+  if(wrongKeys.length>0){
+    h+='<div style="background:#fff5f5;border-radius:16px;padding:14px;margin-top:20px" class="anim-in">';
+    h+='<div style="font-size:14px;font-weight:700;color:#e53e3e;margin-bottom:6px">'+wrongKeys.length+'个待加强汉字（加油！）</div>';
+    h+='<div style="font-size:16px;color:#c53030;letter-spacing:2px;line-height:2">'+wrongKeys.join('')+'</div></div>';
+  }
+  return h;
+}
+function _renderCharCloud(){
+  var h='';
+  var learnedKeys=Object.keys(state.learned||{});
+  var wrongKeys=Object.keys(state.wrong||{});
+  h+='<div class="char-cloud-box anim-in">';
+  h+='<div style="font-size:14px;font-weight:700;color:#667eea;margin-bottom:10px">已认识的 '+learnedKeys.length+' 个汉字</div>';
+  h+='<div class="cc-chars">'+learnedKeys.map(function(c){return '<span>'+c+'</span>'}).join('')+'</div></div>';
+  if(wrongKeys.length>0){
+    h+='<div class="char-cloud-box anim-in" style="background:#fff5f5">';
+    h+='<div style="font-size:14px;font-weight:700;color:#e53e3e;margin-bottom:10px">待加强的 '+wrongKeys.length+' 个汉字</div>';
+    h+='<div class="cc-chars" style="color:#c53030">'+wrongKeys.map(function(c){return '<span>'+c+'</span>'}).join('')+'</div></div>';
+  }
+  return h;
 }
 function retryLesson(){if(!sess)return;clearSess();sess.lessonId==='all'?startAll():sess.lessonId==='danaoAll'?startAllDanao():sess.lessonId==='test2500All'?startAllTest2500():startLesson(sess.lessonId)}
 function nextCard(){
