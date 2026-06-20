@@ -908,7 +908,7 @@ function speak(text){
 // HELPERS
 // ═══════════════════════════════════════════
 function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
-function totalChars(){return LESSONS.reduce((s,l)=>s+l.chars.length,0)}
+function totalChars(){return _dedupChars(LESSONS.flatMap(l=>l.chars)).length}
 function learnedCount(){return Object.keys(state.learned).length}
 function wrongCount(){return Object.keys(state.wrong).length}
 function getWrongChars(){return Object.entries(state.wrong).map(([c,i])=>({char:c,...i})).sort((a,b)=>b.count-a.count)}
@@ -1107,10 +1107,11 @@ function startLesson(id){
   sess={lessonId:id,lessonName:l.name,chars:shuffle(l.chars),idx:0,correct:0,wrong:[],showBack:false};
   navigate('card');
 }
+function _dedupChars(arr){var seen={};return arr.filter(function(c){if(seen[c[0]])return false;seen[c[0]]=1;return true})}
 function startAll(){
   const saved=restoreSess('all');
   if(saved){sess=saved.sess;navigate(saved.screen||'card');return}
-  const all=LESSONS.flatMap(l=>l.chars);
+  const all=_dedupChars(LESSONS.flatMap(l=>l.chars));
   sess={lessonId:'all',lessonName:'全部字卡',chars:shuffle(all),idx:0,correct:0,wrong:[],showBack:false};
   navigate('card');
 }
@@ -1121,7 +1122,7 @@ function startWrongPractice(){
   sess={lessonId:'wrong',lessonName:'错字复习',chars:shuffle(wc.map(w=>[w.char,w.pinyin])),idx:0,correct:0,wrong:[],showBack:false};
   navigate('wrongPractice');
 }
-function danaoCharCount(){return LESSONS.filter(l=>l.group==='全脑识字（大班）').reduce((s,l)=>s+l.chars.length,0)}
+function danaoCharCount(){return _dedupChars(LESSONS.filter(l=>l.group==='全脑识字（大班）').flatMap(l=>l.chars)).length}
 function renderDanaoLessons(el,t){
   t.textContent='全脑识字（大班）';
   const ds=LESSONS.filter(l=>l.group==='全脑识字（大班）');
@@ -1202,7 +1203,7 @@ function renderDanaoLessons(el,t){
 function startAllDanao(){
   const saved=restoreSess('danaoAll');
   if(saved){sess=saved.sess;navigate(saved.screen||'card');return}
-  const all=LESSONS.filter(l=>l.group==='全脑识字（大班）').flatMap(l=>l.chars);
+  const all=_dedupChars(LESSONS.filter(l=>l.group==='全脑识字（大班）').flatMap(l=>l.chars));
   sess={lessonId:'danaoAll',lessonName:'全脑识字·全部',chars:shuffle(all),idx:0,correct:0,wrong:[],showBack:false};
   navigate('card');
 }
